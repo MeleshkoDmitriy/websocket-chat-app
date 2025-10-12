@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, FC } from "react";
-import styles from "./CustomInput.module.less";
+import styles from "./styles.module.less";
 
 interface CustomInputProps extends ComponentPropsWithoutRef<"input"> {
   value: string;

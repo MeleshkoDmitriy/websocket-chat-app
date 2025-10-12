@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./HomePage.module.less";
+import styles from "./styles.module.less";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/constants";
 
