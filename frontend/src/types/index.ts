@@ -1,6 +1,6 @@
 export type TUser = {
   name: string;
-  room?: string;
+  room: string;
 }
 
 export type TMessage = {

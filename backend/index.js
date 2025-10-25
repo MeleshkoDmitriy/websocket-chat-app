@@ -4,7 +4,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import http from "http";
 import { indexRouter } from "./routes/index.js";
-import { addUser } from "./database/index.js";
+import { addUser, findUser, getRoomUsers } from "./database/index.js";
 
 dotenv.config();
 
@@ -31,10 +31,14 @@ io.on("connection", (socket) => {
 
     const { isExist, user } = addUser({ name, room });
 
+    const botMessage = isExist
+      ? `${user.name} has joined the chat`
+      : `Welcome to the chat ${user.name}`;
+
     socket.emit("message", {
       data: {
         user: { name: "🤖 ChatBot" },
-        message: `Welcome to the chat ${user.name}`,
+        message: botMessage,
       },
     });
 
@@ -44,10 +48,26 @@ io.on("connection", (socket) => {
         message: `${user.name} has joined the chat`,
       },
     });
+
+    io.to(user.room).emit("join_room", {
+      data: {
+        users: getRoomUsers(user.room),
+      },
+    });
   });
 
-  socket.on("send_message", ({ massage, params }) => {
+  socket.on("send_message", ({ message, params }) => {
     const { name, room } = params;
+
+    const user = findUser({ name, room });
+
+    if (!user) {
+      return;
+    }
+
+    io.to(user.room).emit("message", {
+      data: { user: user, message: message },
+    });
   });
 
   io.on("disconnect", () => {

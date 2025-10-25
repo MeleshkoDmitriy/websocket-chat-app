@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { FaSmile } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 import type { EmojiClickData } from "emoji-picker-react";
-import type { TMessage } from "@/types";
+import type { TMessage, TUser } from "@/types";
 import { MessageList } from "@/components";
 
 const socket = io(API.SOCKET);
@@ -19,6 +19,7 @@ export const ChatPage = () => {
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [message, setMessage] = useState<string>("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [roomUsers, setRoomUsers] = useState<TUser[]>([]);
 
   useEffect(() => {
     const searchParams = Object.fromEntries(new URLSearchParams(search));
@@ -30,6 +31,12 @@ export const ChatPage = () => {
   useEffect(() => {
     socket.on("message", ({ data }) => {
       setMessages(prev => [...prev, data]);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("join_room", ({ data: { users } }) => {
+      setRoomUsers(users);
     });
   }, []);
 
@@ -58,6 +65,8 @@ export const ChatPage = () => {
       return;
     }
 
+    console.log("message:", message);
+
     socket.emit("send_message", {
       message,
       params,
@@ -69,7 +78,9 @@ export const ChatPage = () => {
   return (
     <div>
       <div>
-        <p>Room: {params?.room || ""} | Users in this room: 0</p>
+        <p>
+          Room: {params?.room || ""} | Users in this room: {roomUsers.length}
+        </p>
         <h1>Chat Page</h1>
         <button onClick={handleLeaveRoom}>Leave Room</button>
       </div>
