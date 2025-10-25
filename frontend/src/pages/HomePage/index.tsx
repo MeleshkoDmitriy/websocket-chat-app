@@ -3,49 +3,55 @@ import styles from "./styles.module.less";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/constants";
 
-const initialFormState = {
-  username: "",
-  roomname: "",
+const FIELDS = {
+  NAME: "name",
+  ROOM: "room",
 };
 
 export const HomePage = () => {
   const navigate = useNavigate();
-  const [formState, setFormState] = useState(initialFormState);
+  const { NAME, ROOM } = FIELDS;
+  const [formState, setFormState] = useState({
+    [NAME]: "",
+    [ROOM]: "",
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+  const handleChange = ({
+    target: { name, value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({ ...formState, [name]: value });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("formState:", formState);
 
-    navigate(
-      `${ROUTES.CHAT}?username=${formState.username}&roomname=${formState.roomname}`
-    );
+    navigate(`${ROUTES.CHAT}?name=${formState[NAME]}&room=${formState[ROOM]}`);
+    setFormState({ [NAME]: "", [ROOM]: "" });
   };
 
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
         <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formState.username}
+          type='text'
+          name='name'
+          placeholder='Name'
+          value={formState[NAME]}
           onChange={handleChange}
-          autoComplete="off"
+          autoComplete='off'
           required
         />
         <input
-          type="text"
-          name="roomname"
-          placeholder="Room name"
-          value={formState.roomname}
+          type='text'
+          name='room'
+          placeholder='Room'
+          value={formState[ROOM]}
           onChange={handleChange}
-          autoComplete="off"
+          autoComplete='off'
           required
         />
-        <button>Sign In</button>
+        <button type='submit'>Join Room</button>
       </form>
     </div>
   );

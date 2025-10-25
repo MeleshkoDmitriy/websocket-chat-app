@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 import { API } from "@/constants";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { FaSmile } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 import type { EmojiClickData } from "emoji-picker-react";
@@ -11,55 +11,56 @@ import { MessageList } from "@/components";
 const socket = io(API.SOCKET);
 
 export const ChatPage = () => {
-  const [searchParams] = useSearchParams();
+  const { search } = useLocation();
+  const [params, setParams] = useState({ name: "", room: "" } as {
+    name: string;
+    room: string;
+  });
   const [messages, setMessages] = useState<TMessage[]>([]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
-    socket.on("connect", () => {
-      socket.emit("join", {
-        username: searchParams.get("username"),
-        roomname: searchParams.get("roomname"),
-      });
-    });
-  }, [searchParams]);
+    const searchParams = Object.fromEntries(new URLSearchParams(search));
+    setParams({ name: searchParams.name || "", room: searchParams.room || "" });
+
+    socket.emit("join", searchParams);
+  }, [search]);
 
   useEffect(() => {
     socket.on("message", ({ data }) => {
-      setMessages((prev) => ({ ...prev, data }));
+      setMessages(prev => [...prev, data]);
     });
   }, []);
 
-  console.log(messages);
+  const handleLeaveRoom = () => {};
 
-  const handleLeaveRoom = () => {
-    // socket.emit("leave", {
-    //   username: searchParams.get("username"),
-    //   roomname: searchParams.get("roomname"),
-    // });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
+  const handleChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(value);
   };
 
   const onIconClick = () => {
-    setShowEmojiPicker((prev) => !prev);
+    setShowEmojiPicker(prev => !prev);
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
     setMessage(message + emojiData.emoji);
+    setShowEmojiPicker(false);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (message.trim() === "") return;
+
+    if (message.trim() === "") {
+      alert("Please enter a message");
+      return;
+    }
 
     socket.emit("send_message", {
       message,
-      username: searchParams.get("username") || "",
-      roomname: searchParams.get("roomname") || "",
+      params,
     });
 
     setMessage("");
@@ -67,20 +68,20 @@ export const ChatPage = () => {
 
   return (
     <div>
-      <h1>Chat Page</h1>
-      <button onClick={handleLeaveRoom}>Leave Room</button>
-      <MessageList
-        messages={messages}
-        username={searchParams.get("username") || ""}
-      />
+      <div>
+        <p>Room: {params?.room || ""} | Users in this room: 0</p>
+        <h1>Chat Page</h1>
+        <button onClick={handleLeaveRoom}>Leave Room</button>
+      </div>
+      <MessageList messages={messages} username={params?.name || ""} />
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
-          name="message"
+          type='text'
+          name='message'
           value={message}
           onChange={handleChange}
-          placeholder="Enter your message"
-          autoComplete="off"
+          placeholder='Enter your message'
+          autoComplete='off'
           required
         />
         <div>
@@ -88,7 +89,7 @@ export const ChatPage = () => {
           {showEmojiPicker && <EmojiPicker onEmojiClick={onEmojiClick} />}
         </div>
 
-        <button type="submit">Send</button>
+        <button type='submit'>Send</button>
       </form>
     </div>
   );

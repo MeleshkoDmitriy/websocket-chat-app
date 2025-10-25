@@ -2,21 +2,19 @@ import { trimString } from "../utils/index.js";
 
 export let users = [];
 
-export const findUser = (user) => {
-  const userName = trimString(user.username);
-  const roomName = trimString(user.roomname);
-
-  return users.find(
-    (u) => trimString(u.roomname) === roomName && trimString(u.username) === userName
-  );
-}
 
 export const addUser = (user) => {
-  const isExistingUser = findUser(user);
+  const userName = trimString(user.name);
+  const roomName = trimString(user.room);
 
-  !isExistingUser && users.push(user);
+  const isExist = users.find((u) => (trimString(u.name) === userName && trimString(u.room) === roomName));
 
-  const currentUser = isExistingUser ? isExistingUser : user;
+  !isExist && users.push(user);
 
-  return { isExistingUser: !!isExistingUser, user: currentUser };
-};
+  const currentUser = isExist ?? user;
+
+  return {
+    isExist: !!isExist,
+    user: currentUser,
+  }
+}

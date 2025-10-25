@@ -1,4 +1,9 @@
+export type TUser = {
+  name: string;
+  room?: string;
+}
+
 export type TMessage = {
-  user: string;
+  user: TUser;
   message: string;
 }

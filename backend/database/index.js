@@ -1,1 +1,6 @@
-export { addUser, findUser } from "./users.js";
+export { 
+  addUser,
+  // findUser,
+  // removeUser,
+  // users,
+} from "./users.js";

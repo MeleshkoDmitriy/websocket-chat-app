@@ -4,7 +4,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import http from "http";
 import { indexRouter } from "./routes/index.js";
-import { addUser, findUser } from "./database/index.js";
+import { addUser } from "./database/index.js";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ const app = express();
 app.use(cors({ origin: "*" }));
 
 // Routes
-app.use("/", indexRouter);
+app.use(indexRouter);
 
 const server = http.createServer(app);
 
@@ -26,50 +26,36 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log(`🔗 A user connected: ${socket.id}`);
+  socket.on("join", ({ name, room }) => {
+    socket.join(room);
 
-  socket.on("join", ({ username, roomname }) => {
-    console.log(`🔗 A user joined the room: ${username} in ${roomname}`);
-    socket.join(roomname);
-
-    const { user } = addUser({ username, roomname });
+    const { isExist, user } = addUser({ name, room });
 
     socket.emit("message", {
       data: {
-        user: "Admin",
-        message: `${user.username} joined the room`,
+        user: { name: "🤖 ChatBot" },
+        message: `Welcome to the chat ${user.name}`,
       },
     });
 
-    socket.broadcast.to(roomname).emit("message", {
+    socket.broadcast.to(user.room).emit("message", {
       data: {
-        user: "Admin",
-        message: `${user.username} joined the room`,
+        user: { name: "🤖 ChatBot" },
+        message: `${user.name} has joined the chat`,
       },
     });
   });
 
-  socket.on("send_message", ({ message, username, roomname }) => {
-    const user = findUser({ username, roomname });
-
-    if (!user) {
-      return;
-    }
-
-    io.to(roomname).emit("message", {
-      data: {
-        user: username,
-        message,
-      },
-    });
+  socket.on("send_message", ({ massage, params }) => {
+    const { name, room } = params;
   });
 
-  io.on("disconnect", (socket) => {
-    console.log(`❌ A user disconnected: ${socket.id}`);
+  io.on("disconnect", () => {
+    console.log("🔴 User disconnected");
   });
 });
 
-const PORT = process.env.PORT || 1337;
+const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log(`🔌 Server is running on port ${PORT}`);
