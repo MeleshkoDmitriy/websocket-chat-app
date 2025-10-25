@@ -1,7 +1,7 @@
 import io from "socket.io-client";
-import { API } from "@/constants";
+import { API, ROUTES } from "@/constants";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaSmile } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 import type { EmojiClickData } from "emoji-picker-react";
@@ -12,6 +12,8 @@ const socket = io(API.SOCKET);
 
 export const ChatPage = () => {
   const { search } = useLocation();
+  const navigate = useNavigate();
+
   const [params, setParams] = useState({ name: "", room: "" } as {
     name: string;
     room: string;
@@ -35,12 +37,18 @@ export const ChatPage = () => {
   }, []);
 
   useEffect(() => {
-    socket.on("join_room", ({ data: { users } }) => {
+    socket.on("room_users", ({ data: { users } }) => {
       setRoomUsers(users);
     });
   }, []);
 
-  const handleLeaveRoom = () => {};
+  const handleLeaveRoom = () => {
+    socket.emit("leave_room", {
+      params,
+    });
+    
+    navigate(ROUTES.HOME);
+  };
 
   const handleChange = ({
     target: { value },
@@ -64,8 +72,6 @@ export const ChatPage = () => {
       alert("Please enter a message");
       return;
     }
-
-    console.log("message:", message);
 
     socket.emit("send_message", {
       message,

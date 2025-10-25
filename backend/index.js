@@ -4,7 +4,13 @@ import cors from "cors";
 import { Server } from "socket.io";
 import http from "http";
 import { indexRouter } from "./routes/index.js";
-import { addUser, findUser, getRoomUsers } from "./database/index.js";
+import {
+  addUser,
+  findUser,
+  getRoomUsers,
+  removeUser,
+} from "./database/index.js";
+import { NAMES } from "./constants/index.js";
 
 dotenv.config();
 
@@ -37,19 +43,19 @@ io.on("connection", (socket) => {
 
     socket.emit("message", {
       data: {
-        user: { name: "🤖 ChatBot" },
+        user: { name: NAMES.BOT },
         message: botMessage,
       },
     });
 
     socket.broadcast.to(user.room).emit("message", {
       data: {
-        user: { name: "🤖 ChatBot" },
+        user: { name: NAMES.BOT },
         message: `${user.name} has joined the chat`,
       },
     });
 
-    io.to(user.room).emit("join_room", {
+    io.to(user.room).emit("room_users", {
       data: {
         users: getRoomUsers(user.room),
       },
@@ -68,6 +74,25 @@ io.on("connection", (socket) => {
     io.to(user.room).emit("message", {
       data: { user: user, message: message },
     });
+  });
+
+  socket.on("leave_room", ({ params }) => {
+    const user = removeUser(params);
+
+    if (user) {
+      const { name, room } = user;
+      const botMessage = `${name} has left the chat`;
+
+      io.to(room).emit("message", {
+        data: { user: { name: NAMES.BOT }, message: botMessage },
+      });
+
+      io.to(room).emit("room_users", {
+        data: {
+          users: getRoomUsers(room),
+        },
+      });
+    }
   });
 
   io.on("disconnect", () => {

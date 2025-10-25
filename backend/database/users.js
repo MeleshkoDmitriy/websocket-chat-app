@@ -27,3 +27,13 @@ export const addUser = (user) => {
 export const getRoomUsers = (room) => {
   return users.filter((user) => user.room === room);
 };
+
+export const removeUser = (user) => {
+  const foundUser = findUser(user);
+
+  if (foundUser) {
+    users = users.filter(({ room, name }) => room !== foundUser.room && name !== foundUser.name);
+  }
+
+  return foundUser;
+};  

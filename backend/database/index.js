@@ -2,6 +2,6 @@ export {
   addUser,
   findUser,
   getRoomUsers,
-  // removeUser,
-  // users,
+  removeUser,
+  users,
 } from "./users.js";
