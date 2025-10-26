@@ -2,4 +2,28 @@
 
 .header {
   background-color: #colors[dark-gray];
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .container:extend(.container) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .title {
+    color: #colors[white];
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .logoContainer {
+    display: flex;
+    gap: #sizes[gap];
+
+    .logo {
+      color: #colors[white];
+    }
+  }
 }

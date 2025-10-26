@@ -1,10 +1,25 @@
+@import "@/styles/index.less";
 
-
-.form {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+.main {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100vh;
+}
+
+.container:extend(.container) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: #sizes[gap];
+    background-color: #colors[dark-gray];
+    padding: #sizes[padding];
+    border-radius: #sizes[border-radius];
+    width: 500px;
+    margin-top: 50px;
+  }
 }

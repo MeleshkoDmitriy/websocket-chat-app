@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./styles.module.less";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/constants";
+import { Input, Button } from "@/components";
 
 const FIELDS = {
   NAME: "name",
@@ -31,28 +32,30 @@ export const HomePage = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <input
-          type='text'
-          name='name'
-          placeholder='Name'
-          value={formState[NAME]}
-          onChange={handleChange}
-          autoComplete='off'
-          required
-        />
-        <input
-          type='text'
-          name='room'
-          placeholder='Room'
-          value={formState[ROOM]}
-          onChange={handleChange}
-          autoComplete='off'
-          required
-        />
-        <button type='submit'>Join Room</button>
-      </form>
-    </div>
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <Input
+            type='text'
+            name='name'
+            placeholder='Name'
+            value={formState[NAME]}
+            onChange={handleChange}
+            autoComplete='off'
+            required
+          />
+          <Input
+            type='text'
+            name='room'
+            placeholder='Room'
+            value={formState[ROOM]}
+            onChange={handleChange}
+            autoComplete='off'
+            required
+          />
+          <Button type='submit' text='Join Room' />
+        </form>
+      </div>
+    </main>
   );
 };
