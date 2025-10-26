@@ -6,7 +6,8 @@ import { FaSmile } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 import type { EmojiClickData } from "emoji-picker-react";
 import type { TMessage, TUser } from "@/types";
-import { MessageList } from "@/components";
+import { MessageList, Input, Button } from "@/components";
+import styles from "./styles.module.less";
 
 const socket = io(API.SOCKET);
 
@@ -82,31 +83,47 @@ export const ChatPage = () => {
   };
 
   return (
-    <div>
-      <div>
-        <p>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <p className={styles.roomInfo}>
           Room: {params?.room || ""} | Users in this room: {roomUsers.length}
         </p>
-        <h1>Chat Page</h1>
-        <button onClick={handleLeaveRoom}>Leave Room</button>
+        <h1 className={styles.title}>Chat Page</h1>
+        <Button text="Leave Room" onClick={handleLeaveRoom} />
       </div>
-      <MessageList messages={messages} username={params?.name || ""} />
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          name='message'
+      
+      <div className={styles.messagesContainer}>
+        <MessageList messages={messages} username={params?.name || ""} />
+      </div>
+      
+      <form onSubmit={handleSubmit} className={styles.inputContainer}>
+        <Input
+          type="text"
+          name="message"
+          placeholder="Enter your message"
           value={message}
           onChange={handleChange}
-          placeholder='Enter your message'
-          autoComplete='off'
+          autoComplete="off"
           required
+          className={styles.messageInput}
         />
-        <div>
-          <FaSmile size={20} onClick={onIconClick} />
-          {showEmojiPicker && <EmojiPicker onEmojiClick={onEmojiClick} />}
+        
+        <div className={styles.emojiContainer}>
+          <button
+            type="button"
+            className={styles.emojiButton}
+            onClick={onIconClick}
+          >
+            <FaSmile size={20} />
+          </button>
+          {showEmojiPicker && (
+            <div className={styles.emojiPicker}>
+              <EmojiPicker onEmojiClick={onEmojiClick} />
+            </div>
+          )}
         </div>
 
-        <button type='submit'>Send</button>
+        <Button text="Send" type="submit" />
       </form>
     </div>
   );

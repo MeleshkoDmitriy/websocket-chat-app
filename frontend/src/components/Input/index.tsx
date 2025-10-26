@@ -9,6 +9,7 @@ interface InputProps extends ComponentPropsWithRef<"input"> {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete: string;
   required: boolean;
+  className?: string;
 }
 
 export const Input = ({
@@ -19,6 +20,7 @@ export const Input = ({
   onChange,
   autoComplete = "off",
   required = false,
+  className,
   ...props
 }: InputProps) => {
   return (
@@ -30,8 +32,8 @@ export const Input = ({
       onChange={onChange}
       autoComplete={autoComplete}
       required={required}
+      className={`${styles.input} ${className || ""}`}
       {...props}
-      className={styles.input}
     />
   );
 };

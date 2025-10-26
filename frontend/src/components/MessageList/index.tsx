@@ -13,9 +13,16 @@ export const MessageList = ({ messages, username }: MessageListProps) => {
         messages.map((m, index) => {
           const isOwnMessage =
             m.user.name.trim().toLowerCase() === username.trim().toLowerCase();
-          const dynamicClassName = isOwnMessage
-            ? styles.ownMessage
-            : styles.otherMessage;
+          const isBotMessage = m.user.name.includes("🤖");
+          
+          let dynamicClassName;
+          if (isBotMessage) {
+            dynamicClassName = styles.botMessage;
+          } else if (isOwnMessage) {
+            dynamicClassName = styles.ownMessage;
+          } else {
+            dynamicClassName = styles.otherMessage;
+          }
 
           return (
             <div
